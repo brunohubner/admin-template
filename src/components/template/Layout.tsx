@@ -1,4 +1,5 @@
 import { ReactNode } from "react"
+import { useTheme } from "../../context/ThemeContext"
 import AsideMenu from "./AsideMenu"
 import Content from "./Content"
 import Header from "./Header"
@@ -10,8 +11,10 @@ interface IProps {
 }
 
 export default function Layout({ title, subtitle, children }: IProps) {
+    const { theme } = useTheme()
+
     return (
-        <div className={`dark flex h-screen w-screen`}>
+        <div className={`${theme || ""} flex h-screen w-screen`}>
             <AsideMenu></AsideMenu>
             <div
                 className={`
