@@ -1,4 +1,5 @@
 import { useTheme } from "../../context/ThemeContext"
+import AlterThemeButton from "./AlterThemeButton"
 import Title from "./Title"
 
 interface IProps {
@@ -7,11 +8,13 @@ interface IProps {
 }
 
 export default function Header(props: IProps) {
-    const { alterTheme } = useTheme()
+    const { alterTheme, theme } = useTheme()
     return (
-        <header>
+        <header className={`flex`}>
             <Title {...props}></Title>
-            <button onClick={alterTheme}>Alterar Tema</button>
+            <div className={`flex flex-1 justify-end`}>
+                <AlterThemeButton theme={theme} alterTheme={alterTheme} />
+            </div>
         </header>
     )
 }
