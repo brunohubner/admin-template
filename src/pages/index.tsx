@@ -1,9 +1,14 @@
-import styles from "../styles/Home.module.css"
+import Layout from "../components/template/Layout"
 
 export default function Home() {
     return (
-        <div className={styles.home}>
-            <h1 className="text-3xl font-bold underline">Hello world!</h1>
+        <div>
+            <Layout
+                title="Página Inicial"
+                subtitle="Este é um template administrativo"
+            >
+                <h1>Conteudo da página inicial</h1>
+            </Layout>
         </div>
     )
 }
