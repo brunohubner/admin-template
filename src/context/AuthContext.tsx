@@ -6,8 +6,10 @@ import {
     useState
 } from "react"
 import {
+    createUserWithEmailAndPassword,
     GoogleAuthProvider,
     NextOrObserver,
+    signInWithEmailAndPassword,
     signOut,
     User
 } from "firebase/auth"
@@ -16,16 +18,31 @@ import Router from "next/router"
 import firebaseAuth from "../firebase"
 import { signInWithPopup, onIdTokenChanged } from "firebase/auth"
 import Cookie from "js-cookie"
+import { validEmail } from "../utils/regex"
 
 interface IProps {
     children?: ReactNode
 }
 
+interface ILoginData {
+    email: string
+    password: string
+}
+
+interface ISignupData {
+    email: string
+    password: string
+    passwordConfirmation: string
+}
+
 interface IAuthContext {
     user: UserModel
     loading: boolean
-    googleLogin?: () => Promise<void>
-    logout?: () => void
+    errorMessage: string
+    signup: (data: ISignupData) => void
+    login: (data: ILoginData) => void
+    googleLogin: () => Promise<void>
+    logout: () => void
 }
 
 const INITIAL_STATE: IAuthContext = {
@@ -37,7 +54,12 @@ const INITIAL_STATE: IAuthContext = {
         avatarUrl: null,
         provider: ""
     },
-    loading: true
+    errorMessage: "",
+    loading: true,
+    signup() {},
+    login() {},
+    async googleLogin() {},
+    logout() {}
 }
 
 const AuthContext = createContext<IAuthContext>(INITIAL_STATE)
@@ -73,27 +95,72 @@ export function useAuth() {
 export function AuthProvider({ children }: IProps) {
     const [user, setUser] = useState<UserModel>(INITIAL_STATE.user)
     const [loading, setLoading] = useState(INITIAL_STATE.loading)
+    const [errorMessage, setErrorMessage] = useState(INITIAL_STATE.errorMessage)
+
+    function showError(message: string, timeInSeconds = 5) {
+        setErrorMessage(message)
+        setTimeout(() => setErrorMessage(""), timeInSeconds * 1000)
+    }
 
     async function sessionSetup(
         firebaseUser: User | null
     ): Promise<NextOrObserver<User>> {
+        if (firebaseUser?.email) {
+            const user = await normalizeUser(firebaseUser)
+            setUser(user)
+            cookieMananger(true)
+            setLoading(false)
+            return () => firebaseUser
+        }
+        setUser(INITIAL_STATE.user)
+        cookieMananger(false)
+        setLoading(false)
+        return () => firebaseUser
+    }
+
+    async function signup({
+        email,
+        password,
+        passwordConfirmation
+    }: ISignupData) {
         try {
-            if (firebaseUser?.email) {
-                const user = await normalizeUser(firebaseUser)
-                setUser(user)
-                cookieMananger(true)
-                setLoading(false)
-                return () => firebaseUser
+            if (!validEmail.test(email)) {
+                showError("Email inválido")
+                return
             }
-            setUser(INITIAL_STATE.user)
-            cookieMananger(false)
-            setLoading(false)
-            return () => firebaseUser
+            if (password.length < 8) {
+                showError("A senha deve ter pelo menos 8 caracteres")
+                return
+            }
+            if (password !== passwordConfirmation) {
+                showError("As senhas não conferem")
+                return
+            }
+            const resp = await createUserWithEmailAndPassword(
+                firebaseAuth,
+                email,
+                password
+            )
+
+            await sessionSetup(resp.user)
+            Router.push("/")
         } catch {
-            console.log("Não foi possível se autenticar com o Google")
-            return () => firebaseUser
-        } finally {
-            setLoading(false)
+            showError("Dados inválidos")
+        }
+    }
+
+    async function login({ email, password }: ILoginData) {
+        try {
+            const resp = await signInWithEmailAndPassword(
+                firebaseAuth,
+                email,
+                password
+            )
+
+            await sessionSetup(resp.user)
+            Router.push("/")
+        } catch {
+            showError("Email ou senha inválidos")
         }
     }
 
@@ -104,10 +171,10 @@ export function AuthProvider({ children }: IProps) {
                 new GoogleAuthProvider()
             )
 
-            sessionSetup(resp.user)
+            await sessionSetup(resp.user)
             Router.push("/")
         } catch {
-            console.log("Não foi possível entrar com o Google")
+            showError("Não foi possível entrar com o Google")
         }
     }
 
@@ -116,8 +183,6 @@ export function AuthProvider({ children }: IProps) {
             setLoading(true)
             await signOut(firebaseAuth)
             await sessionSetup(null)
-        } catch {
-            console.log("Ocorreu um problema ao sair")
         } finally {
             setLoading(false)
         }
@@ -134,7 +199,17 @@ export function AuthProvider({ children }: IProps) {
     useEffect(autoLogin, [])
 
     return (
-        <AuthContext.Provider value={{ user, loading, googleLogin, logout }}>
+        <AuthContext.Provider
+            value={{
+                user,
+                loading,
+                errorMessage,
+                login,
+                signup,
+                googleLogin,
+                logout
+            }}
+        >
             {children}
         </AuthContext.Provider>
     )

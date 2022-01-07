@@ -5,24 +5,20 @@ import { ExclamationIcon, GoogleIcon } from "../components/icons"
 import { useAuth } from "../context/AuthContext"
 
 export default function Auth() {
-    const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
+    const [passwordConfirmation, setPasswordConfirmation] = useState("")
     const [isLogin, setIsLogin] = useState(true)
-    const [error, setError] = useState("")
 
-    const { user, googleLogin } = useAuth()
+    const { errorMessage, signup, login, googleLogin } = useAuth()
 
     function submit() {
         if (isLogin) {
+            login({ email, password })
             return
         }
-    }
-
-    function showError(message: string, timeInSeconds = 5) {
-        setError(message)
-        setTimeout(() => setError(""), timeInSeconds * 1000)
+        signup({ email, password, passwordConfirmation })
+        return
     }
 
     return (
@@ -44,7 +40,7 @@ export default function Auth() {
                         ? "Entre com sua conta"
                         : "Cadastre-se na Plataforma"}
                 </h1>
-                {error ? (
+                {errorMessage ? (
                     <div
                         className={`
                     flex items-center bg-red-400 text-white py-3 px-5
@@ -52,21 +48,10 @@ export default function Auth() {
                 `}
                     >
                         {ExclamationIcon()}
-                        <span className={`ml-3`}>{error}</span>
+                        <span className={`ml-3`}>{errorMessage}</span>
                     </div>
                 ) : (
                     false
-                )}
-
-                {isLogin ? (
-                    false
-                ) : (
-                    <AuthInput
-                        label="Nome"
-                        value={name}
-                        onChange={setName}
-                        required
-                    ></AuthInput>
                 )}
 
                 <AuthInput
@@ -88,9 +73,9 @@ export default function Auth() {
                 ) : (
                     <AuthInput
                         label="Confirme a senha"
-                        value={confirmPassword}
+                        value={passwordConfirmation}
                         type="password"
-                        onChange={setConfirmPassword}
+                        onChange={setPasswordConfirmation}
                         required
                     ></AuthInput>
                 )}
