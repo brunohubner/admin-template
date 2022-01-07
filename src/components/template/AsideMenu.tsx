@@ -1,8 +1,11 @@
+import { useAuth } from "../../context/AuthContext"
 import { BellIcon, CogIcon, HomeIcon, LogoutIcon } from "../icons"
 import Logo from "./Logo"
 import MenuItem from "./MenuItem"
 
 export default function AsideMenu() {
+    const { logout } = useAuth()
+
     return (
         <aside
             className={`
@@ -34,7 +37,7 @@ export default function AsideMenu() {
             </ul>
             <ul>
                 <MenuItem
-                    onClick={() => console.log("logout")}
+                    onClick={logout}
                     label="Sair"
                     icon={LogoutIcon}
                     className={`
