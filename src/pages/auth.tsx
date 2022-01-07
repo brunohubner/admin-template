@@ -2,14 +2,17 @@
 import { useState } from "react"
 import AuthInput from "../auth/AuthInput"
 import { ExclamationIcon, GoogleIcon } from "../components/icons"
+import { useAuth } from "../context/AuthContext"
 
 export default function Auth() {
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
-    const [isLogin, setIslogin] = useState(true)
+    const [isLogin, setIsLogin] = useState(true)
     const [error, setError] = useState("")
+
+    const { user, googleLogin } = useAuth()
 
     function submit() {
         if (isLogin) {
@@ -107,7 +110,7 @@ export default function Auth() {
                 w-full bg-withe hover:bg-gray-100
                 text-gray-900 font-bold rounded-lg py-3 border border-gray-300
             `}
-                        onClick={submit}
+                        onClick={googleLogin}
                     >
                         <span>{GoogleIcon()}</span>
                         <span className={`ml-2`}>Entrar com o Google</span>
@@ -120,9 +123,9 @@ export default function Auth() {
                         Novo por aqui?&nbsp;
                         <a
                             className={`
-                            text-blue-500 hover:text-blue-800 font-semibold cursor-pointer
+                            text-blue-500 hover:text-blue-800 cursor-pointer
                             `}
-                            onClick={() => setIslogin(false)}
+                            onClick={() => setIsLogin(false)}
                         >
                             Cadastre-se gratuitamente!
                         </a>
@@ -134,9 +137,9 @@ export default function Auth() {
                             className={`
                             text-blue-500 hover:text-blue-800 cursor-pointer
                             `}
-                            onClick={() => setIslogin(true)}
+                            onClick={() => setIsLogin(true)}
                         >
-                            Fazer Login agora!
+                            Faça Login agora!
                         </a>
                     </p>
                 )}
