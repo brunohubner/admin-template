@@ -23,8 +23,9 @@ interface IProps {
 
 interface IAuthContext {
     user: UserModel
-    googleLogin: () => Promise<void>
-    logout: () => void
+    loading: boolean
+    googleLogin?: () => Promise<void>
+    logout?: () => void
 }
 
 const INITIAL_STATE: IAuthContext = {
@@ -36,8 +37,7 @@ const INITIAL_STATE: IAuthContext = {
         avatarUrl: null,
         provider: ""
     },
-    googleLogin: async () => {},
-    logout() {}
+    loading: true
 }
 
 const AuthContext = createContext<IAuthContext>(INITIAL_STATE)
@@ -72,7 +72,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }: IProps) {
     const [user, setUser] = useState<UserModel>(INITIAL_STATE.user)
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(INITIAL_STATE.loading)
 
     async function sessionSetup(
         firebaseUser: User | null
@@ -128,12 +128,13 @@ export function AuthProvider({ children }: IProps) {
             const cancel = onIdTokenChanged(firebaseAuth, sessionSetup)
             return () => cancel()
         }
+        setLoading(false)
     }
 
     useEffect(autoLogin, [])
 
     return (
-        <AuthContext.Provider value={{ user, googleLogin, logout }}>
+        <AuthContext.Provider value={{ user, loading, googleLogin, logout }}>
             {children}
         </AuthContext.Provider>
     )
