@@ -1,5 +1,5 @@
 import { useAuth } from "../../context/AuthContext"
-import { BellIcon, CogIcon, HomeIcon, LogoutIcon } from "../icons"
+import { BellIcon, CogIcon, HomeIcon, LogoutIcon, QuestionIcon } from "../icons"
 import Logo from "./Logo"
 import MenuItem from "./MenuItem"
 
@@ -28,6 +28,11 @@ export default function AsideMenu() {
                     url="/notifications"
                     label="Notificações"
                     icon={BellIcon}
+                ></MenuItem>
+                <MenuItem
+                    url="/about"
+                    label="Sobre"
+                    icon={QuestionIcon}
                 ></MenuItem>
                 <MenuItem
                     url="/settings"

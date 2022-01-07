@@ -1,22 +1,16 @@
 import Head from "next/head"
 import Layout from "../components/template/Layout"
 
-export default function Notifications() {
+export default function About() {
     return (
         <>
             <Head>
-                <title>Bruno Hubner - Notificações</title>
-                <meta
-                    name="description"
-                    content="Bruno Hubner - Notificações"
-                />
+                <title>Bruno Hubner - Sobre</title>
+                <meta name="description" content="Bruno Hubner - Sobre" />
             </Head>
             <div>
-                <Layout
-                    title="Notificações"
-                    subtitle="Área de gerenciamento de notificações"
-                >
-                    <h1>Conteudo da página de notificações</h1>
+                <Layout title="Sobre" subtitle="Informações gerais">
+                    <h1>Conteudo da página de perfil de usuário</h1>
                     <p className={`indent-8 mt-4`}>
                         Lorem ipsum dolor sit amet consectetur adipisicing elit.
                         Iusto facere magnam nobis neque a architecto sapiente,
