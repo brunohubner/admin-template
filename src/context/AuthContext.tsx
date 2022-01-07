@@ -42,7 +42,7 @@ const INITIAL_STATE: IAuthContext = {
 
 const AuthContext = createContext<IAuthContext>(INITIAL_STATE)
 
-const cookieKey = "admin-template-auth"
+export const authCookieKey = "admin-template-auth"
 
 async function normalizeUser(firebaseUser: User): Promise<UserModel> {
     const token = await firebaseUser.getIdToken()
@@ -58,12 +58,12 @@ async function normalizeUser(firebaseUser: User): Promise<UserModel> {
 
 function cookieMananger(logged: boolean) {
     if (logged) {
-        Cookie.set(cookieKey, "true", {
+        Cookie.set(authCookieKey, "true", {
             expires: 7 //days
         })
         return
     }
-    Cookie.remove(cookieKey)
+    Cookie.remove(authCookieKey)
 }
 
 export function useAuth() {
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: IProps) {
     }
 
     function autoLogin() {
-        if (Cookie.get(cookieKey)) {
+        if (Cookie.get(authCookieKey)) {
             const cancel = onIdTokenChanged(firebaseAuth, sessionSetup)
             return () => cancel()
         }

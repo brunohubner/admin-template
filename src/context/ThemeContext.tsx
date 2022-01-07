@@ -1,4 +1,10 @@
-import { createContext, ReactNode, useContext, useState } from "react"
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState
+} from "react"
 
 export type Theme = "" | "dark"
 
@@ -26,8 +32,17 @@ export function ThemeProvider({ children }: IThemeProvider) {
     const [theme, setTheme] = useState<Theme>(INITIAL_STATE.theme)
 
     function alterTheme() {
-        setTheme(theme === "" ? "dark" : "")
+        const newTheme = theme === "" ? "dark" : ""
+        setTheme(newTheme)
+        localStorage.setItem("theme", newTheme)
     }
+
+    function getLocalTheme() {
+        const localTheme = localStorage.getItem("theme") as Theme
+        setTheme(localTheme)
+    }
+
+    useEffect(getLocalTheme, [])
 
     return (
         <ThemeContext.Provider value={{ theme, alterTheme }}>
